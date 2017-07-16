@@ -1,0 +1,13 @@
+{
+	"name": "Creepy Crawler",
+	"version": "0.0.0",
+	"description": "A web crawler that fetches creepypasta posts",
+	"main": "main.js",
+	"author": "Elan van Biljon",
+	"dependencies": {
+		"async-parallel": "^1.2.3",
+		"cheerio": "^1.0.0",
+		"url-parse": "^1.1.9",
+		"request": "^2.81.0"
+	}
+}
