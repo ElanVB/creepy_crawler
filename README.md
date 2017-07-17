@@ -7,7 +7,7 @@ rather go until a page is found that does not contain the correct information
 * post boxes container - div class="content home-2" (maybe not home-2)
 * post box - div class="block-post"
 * post info: - div class="post-content"
-+ post title - a href="<_URL_>" title="<_TITLE_>"
++ post title - h3 a href="<_URL_>" title="<_TITLE_>"
 + post rating info - div class="gdrts-rating-text"
 + rating - strong
 + votes - (after strong)
