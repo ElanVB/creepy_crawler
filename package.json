@@ -8,6 +8,7 @@
 		"async-parallel": "^1.2.3",
 		"cheerio": "^1.0.0-rc.2",
 		"url-parse": "^1.1.9",
-		"request": "^2.81.0"
+		"request": "^2.81.0",
+		"file-system": "^2.2.2"
 	}
 }
