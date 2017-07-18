@@ -7,13 +7,34 @@ var fs = require('file-system');
 var posts = []
 
 var pagePrefix = "http://www.creepypasta.com/page/";
-var pageNumber = 290;
+var pageNumber = 0;
+var endPageNumber = 292;
 
 var startCount = 0;
 var endCount = 0;
 
+function getStopPage(after) {
+	request({
+		method: 'GET',
+		url: pagePrefix + "2",
+		timeout: 10000
+	}, function(error, response, body) {
+		if(error) {
+			console.log("Error: " + error);
+		}
+
+		if(response.statusCode === 200) {
+			var $ = cheerio.load(body);
+			endPageNumber = parseInt($('title').text().toLowerCase().split(" ")[5]);
+			
+			after();
+		} else {
+			console.log("Status Code: ", response.statusCode);
+		}
+	});
+}
+
 function getPageInfo(url, pushToPosts, afterEach) {
-	console.log('get page', url);
 	request({
 		method: 'GET',
 		url: url,
@@ -92,12 +113,16 @@ function savePostsWhenDone() {
 	}
 }
 
-for(var pageIncrement = 0; pageIncrement + pageNumber <= 292; pageIncrement++) {
-	var url = pagePrefix + (pageNumber + pageIncrement).toString();
-	startCount++;
-	getPageInfo(url, pushToPosts, function() {
-		endCount++;
-	});
+function getPages() {
+	for(var pageIncrement = 0; pageIncrement + pageNumber <= endPageNumber; pageIncrement++) {
+		var url = pagePrefix + (pageNumber + pageIncrement).toString();
+		startCount++;
+		getPageInfo(url, pushToPosts, function() {
+			endCount++;
+		});
+	}
+
+	savePostsWhenDone();
 }
 
-savePostsWhenDone();
+getStopPage(getPages);
