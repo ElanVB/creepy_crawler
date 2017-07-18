@@ -7,13 +7,20 @@ var fs = require('file-system');
 var posts = []
 
 var pagePrefix = "http://www.creepypasta.com/page/";
-var pageNumber = 1;
+var pageNumber = 290;
 
-var url = pagePrefix + pageNumber.toString();
+var startCount = 0;
+var endCount = 0;
 
-function getPageInfo(url, pushToPosts, done) {
-	request(url, function(error, response, body) {
+function getPageInfo(url, pushToPosts, afterEach) {
+	console.log('get page', url);
+	request({
+		method: 'GET',
+		url: url,
+		timeout: 10000
+	}, function(error, response, body) {
 		if(error) {
+			afterEach();
 			console.log("Error: " + error);
 		}
 
@@ -21,8 +28,7 @@ function getPageInfo(url, pushToPosts, done) {
 			var $ = cheerio.load(body);
 			var pageTitle = $('title').text();
 
-			if(pageTitle.toLowerCase() !== "page not found") {
-
+			if(pageTitle.toLowerCase().indexOf("page not found") === -1) {
 				var $posts = $('div.post-content');
 
 				$posts.each(function(index, element) {
@@ -39,17 +45,15 @@ function getPageInfo(url, pushToPosts, done) {
 					});
 				});
 
-				done();
+				afterEach();
+			} else {
+				console.log("Page not found");
 			}
 		} else {
 			console.log("Status Code: ", response.statusCode);
 		}
 	});
 }
-
-// fs.writeFile(pageNumber.toString() + ".txt", body, function(err) {
-// 	if(err) throw err;
-// });
 
 // function fetchPostInfo(pushToPosts) {
 // 	fs.readFile(pageNumber.toString() + ".txt", "utf8", function(err, data) {
@@ -78,6 +82,22 @@ function pushToPosts(post) {
 	posts.push(post);
 }
 
-getPageInfo(url, pushToPosts, function() {
-	console.log(posts);
-});
+function savePostsWhenDone() {
+	if(startCount === endCount) {
+		fs.writeFile('postData.json', JSON.stringify(posts), function(err) {
+			if(err) throw err;
+		});
+	} else {
+		setTimeout(savePostsWhenDone, 500);
+	}
+}
+
+for(var pageIncrement = 0; pageIncrement + pageNumber <= 292; pageIncrement++) {
+	var url = pagePrefix + (pageNumber + pageIncrement).toString();
+	startCount++;
+	getPageInfo(url, pushToPosts, function() {
+		endCount++;
+	});
+}
+
+savePostsWhenDone();
